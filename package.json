@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node backend/server.js",
     "devStart": "nodemon backend/server.js",
-    "test": "jest"
+    "test": "node -r dotenv/config $(which jest)"
   },
   "repository": {
     "type": "git",
