@@ -3,17 +3,30 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { getUsers } from '../plugin/Users';
 
 import Title from './Title'
 
 const Body = () => {
 
-    const [date, setDate] = useState()
+    const [date, setDate] = useState();
+    const [users, setUsers] = useState([]);
     
     useEffect(() => {
     console.log(date) 
     }, [date])
     
+    async function retrieveUsers(){
+        const data = await getUsers();
+        console.log(users);
+        setUsers(data);
+    }
+    
+    useEffect(() =>{
+        retrieveUsers();
+        
+    }, [])
+
     const submit = () => {
         alert("Seat booked");
         }
@@ -27,8 +40,7 @@ const Body = () => {
         <div className='flex flex-col'>
             <label>Enter User</label>
             <select>
-                <option>User 1</option>
-                <option>User 1</option>
+                {users.map(user => <option key={user._id}>{user.name}</option>)}
             </select>
         </div>
 
