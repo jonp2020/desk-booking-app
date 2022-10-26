@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { getUsers } from '../plugin/Users';
+import { retrieveSeats } from '../plugin/Seats';
 
 import Title from './Title'
 
@@ -12,7 +13,7 @@ const Body = () => {
     const [date, setDate] = useState();
     const [allUsers, setAllUsers] = useState([]);
     const [seat, setSeat] = useState();
-    const [allSeats, setAllSeats] = useState([[{id:0, seatNo:1, tableNo:2}], [{id:1, seatNo:2, tableNo:3}]]);
+    const [allSeats, setAllSeats] = useState([[{id:0, seatNo:1, tableNo:2, available:true}], [{id:1, seatNo:2, tableNo:3, available:false}]]);
     const [selectedUser, setSelectedUser] = useState();
     const [time, setTime] = useState();
 
@@ -33,8 +34,16 @@ const Body = () => {
         
     }, [])
 
-    const selectSeat = (event) => {
-        setSeat(event.target.id)
+    useEffect(()=>{
+        retrieveSeats(date, time);
+    },[date, time])
+
+    const selectSeat = (seat) => {
+        if (seat.available){
+        setSeat(seat._id)
+        }else{
+            alert("Seat unavailable");  
+        }
     } 
     
 
@@ -101,7 +110,9 @@ const Body = () => {
                                { 
                                 table.map((seats,i) =>
                                {
-                                return <div key={i} id={seats.seatNo} className='bg-green-500 h-12 w-12 text-center rounded-lg' onClick={selectSeat}>{seats.seatNo}</div>
+                                return <div key={i} id={seats.seatNo} 
+                                className={`h-12 w-12 text-center rounded-lg ${ seats.available ?'bg-green-500' : 'bg-red-500'}`} 
+                                onClick={()=>selectSeat(seats)}>{seats.seatNo}</div>
                                })
                     }       
                                 
