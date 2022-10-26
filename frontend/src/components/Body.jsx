@@ -3,21 +3,45 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { getUsers } from '../plugin/Users';
 
 import Title from './Title'
 
 const Body = () => {
 
-    const [date, setDate] = useState()
-    
+    const [date, setDate] = useState();
+    const [allUsers, setAllUsers] = useState([]);
+    const [seat, setSeat] = useState();
+    const [allSeats, setAllSeats] = useState([[{id:0, seatNo:1, tableNo:2}], [{id:1, seatNo:2, tableNo:3}]]);
+    const [selectedUser, setSelectedUser] = useState();
+    const [time, setTime] = useState();
+
     useEffect(() => {
-    console.log(date) 
-    }, [date])
+    console.log(seat) 
+    console.log(selectedUser)
+    console.log(time)
+    }, [seat, selectedUser, time])
     
+    async function retrieveUsers(){
+        const data = await getUsers();
+        
+        setAllUsers(data);
+    }
+    
+    useEffect(() =>{
+        retrieveUsers();
+        
+    }, [])
+
+    const selectSeat = (event) => {
+        setSeat(event.target.id)
+    } 
+    
+
     const submit = () => {
         alert("Seat booked");
         }
-
+    
   return (
     <>
     <Title title='Make Booking' />
@@ -26,9 +50,8 @@ const Body = () => {
     <div className="flex justify-around">
         <div className='flex flex-col'>
             <label>Enter User</label>
-            <select>
-                <option>User 1</option>
-                <option>User 1</option>
+            <select onChange={(event)=> setSelectedUser(event.target.value)}>
+                {allUsers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
             </select>
         </div>
 
@@ -38,20 +61,20 @@ const Body = () => {
         onSelect={setDate}/>
         <div className="flex flex-col">
             <div className="flex">
-                <input type={'radio'} name="time" value="am" />
+                <input type={'radio'} name="time" value="am" onChange={(event)=> setTime(event.target.value)} />
                 <label className='ml-2'>AM</label>
             </div>
             <div className="flex">
-                <input type={'radio'} name="time" value="pm" />
+                <input type={'radio'} name="time" value="pm" onChange={(event)=> setTime(event.target.value)}/>
                 <label className='ml-2'>PM</label>
             </div>
             <div className="flex">
-                <input type={'radio'} name="time" value="all-day" />
+                <input type={'radio'} name="time" value="all-day" onChange={(event)=> setTime(event.target.value)}/>
                 <label className='ml-2'>All Day</label>
             </div>        
         </div>     
     </div>
-
+    
     {/* TABLE PLAN */}
     <div className='bg-gray-200 mx-28 rounded-3xl shadow-lg pt-12'>
         <div className="flex justify-center gap-8 ">
@@ -70,17 +93,24 @@ const Body = () => {
         </div>
 
         <div className="flex justify-center  py-12 ">
-            <div className="flex flex-col border-4 border-black items-center justify-between p-6 rounded-3xl w-44 h-44">
-                <div className="flex justify-between w-full">
-                    <div className='bg-green-500 h-12 w-12 text-center rounded-lg'>1</div>
-                    <div className='bg-green-500 h-12 w-12 text-center rounded-lg'>2</div>
-                </div>
-
-                <div className="flex justify-between w-full">
-                    <div className='bg-green-500 h-12 w-12 text-center rounded-lg'>3</div>
-                    <div className='bg-green-500 h-12 w-12 text-center rounded-lg'>4</div>
-                </div>
-            </div>
+           
+                {
+                    allSeats.map((table,i)=> {
+                        return  <div key={i} className="flex flex-col border-4 border-black items-center justify-between p-6 rounded-3xl w-44 h-44">
+                                <div className="flex justify-between w-full">
+                               { 
+                                table.map((seats,i) =>
+                               {
+                                return <div key={i} id={seats.seatNo} className='bg-green-500 h-12 w-12 text-center rounded-lg' onClick={selectSeat}>{seats.seatNo}</div>
+                               })
+                    }       
+                                
+                            </div>
+                        </div>
+                    })
+                   
+                }
+                
         </div>
     </div>
 
