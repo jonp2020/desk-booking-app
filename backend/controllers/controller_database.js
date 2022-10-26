@@ -16,7 +16,10 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
     // loop through and create a new object which includes the bookings
     // save that into some kind of new object and send that back
 
-    const {office, date, time} = request.body;
+    const {office, date, time} = request.query;
+    // console.log(office);
+    // console.log(date);
+    // console.log(time);
 
     const all_reservations = await Reservations.find({office, date});
     let reservations = [];
@@ -49,7 +52,7 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
 
     // console.log("Workstations (Post-Processed):", workstations);
 
-    response.status(200).json(reservations);
+    response.status(200).json(workstations);
 
 });
 
