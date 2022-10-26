@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+
 import { getUsers } from '../plugin/Users';
 import { retrieveSeats } from '../plugin/Seats';
 
@@ -24,13 +25,14 @@ const Body = () => {
     //   }
     const [allSeats, setAllSeats] = useState({T1: { "1": true, "2": false, "3": true, "4": false }});
     const [selectedUser, setSelectedUser] = useState();
-    const [time, setTime] = useState('all-day');
+    const [time, setTime] = useState('FULLDAY');
 
     useEffect(() => {
     console.log(seat) 
     console.log(selectedUser)
     console.log(time)
-    }, [seat, selectedUser, time])
+    console.log(allSeats)
+    }, [seat, selectedUser, time, allSeats])
     
     async function retrieveUsers(){
         const data = await getUsers();
@@ -39,12 +41,21 @@ const Body = () => {
     }
     
     useEffect(() =>{
+
         retrieveUsers();
         
     }, [])
 
+    const retrieveAllSeats = async () => {
+        if (date && time) {
+            const data = await retrieveSeats(date, time)
+        setAllSeats(data)
+        }
+        
+    }
+
     useEffect(()=>{
-        retrieveSeats(date, time);
+        retrieveAllSeats()
     },[date, time])
 
     const selectSeat = (event, table, seat) => {
@@ -80,15 +91,15 @@ const Body = () => {
         onSelect={setDate}/>
         <div className="flex flex-col">
             <div className="flex">
-                <input type={'radio'} name="time" value="am" onChange={(event)=> setTime(event.target.value)} />
+                <input type={'radio'} name="time" value="AM" onChange={(event)=> setTime(event.target.value)} />
                 <label className='ml-2'>AM</label>
             </div>
             <div className="flex">
-                <input type={'radio'} name="time" value="pm" onChange={(event)=> setTime(event.target.value)}/>
+                <input type={'radio'} name="time" value="PM" onChange={(event)=> setTime(event.target.value)}/>
                 <label className='ml-2'>PM</label>
             </div>
             <div className="flex">
-                <input type={'radio'} name="time" value="all-day" defaultChecked onChange={(event)=> setTime(event.target.value)}/>
+                <input type={'radio'} name="time" value="FULLDAY" defaultChecked onChange={(event)=> setTime(event.target.value)}/>
                 <label className='ml-2'>All Day</label>
             </div>        
         </div>     
