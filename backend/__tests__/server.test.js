@@ -27,6 +27,7 @@ afterAll(async () => {
     test("It should return a 200 status code", () => {
       return request(app)
         .get("/api/reservations")
+        .send({"office": "JEMISON", "date": "01/01/1901", "time": "FULLDAY"})
         .then(response => {
           expect(response.statusCode).toBe(200);
         });
@@ -37,11 +38,11 @@ afterAll(async () => {
     const testReservation = 	{
       "office": "JEMISON",
       "name": "Jon", 
-      "seat_no": "10000",
-      "table_no": "10000",
+      "seat_no": "20",
+      "table_no": "T5",
       "monitor": "false",
       "date": "01/01/1900",
-      "time": "N/A"
+      "time": "FULLDAY"
     };
     test("It should post to the db and return a 201 status code", () => {
       return request(app)
@@ -58,7 +59,7 @@ afterAll(async () => {
     test("It should DELETE a record and return a 202", () => {
       return request(app)
         .delete("/api/reservations")
-        .send({"date": "01/01/1900", "time": "N/A", "seat_no": "10000", "table_no": "10000"})
+        .send({"date": "01/01/1900", "time": "FULLDAY", "seat_no": "20", "table_no": "T5"})
         .then(response => {
           expect(response.statusCode).toBe(202);
         });
