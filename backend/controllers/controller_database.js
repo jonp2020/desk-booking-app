@@ -49,7 +49,7 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
 
     // console.log("Workstations (Post-Processed):", workstations);
 
-    response.status(200).json(reservations);
+    response.status(200).json(workstations);
 
 });
 
