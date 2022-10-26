@@ -41,7 +41,7 @@ afterAll(async () => {
     test("It should return a 200 status code", () => {
       return request(app)
         .get("/api/reservations")
-        .send({"office": "JEMISON", "date": "01/01/1901", "time": "FULLDAY"})
+        .query({"office": "JEMISON", "date": "01/01/1901", "time": "FULLDAY"})
         .then(response => {
           expect(response.statusCode).toBe(200);
         });
