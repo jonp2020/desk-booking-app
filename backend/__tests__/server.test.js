@@ -19,20 +19,12 @@ afterAll(async () => {
       .get("/api/users")
       .then((res) => {
         expect(res.statusCode).toBe(200);
-      })
-    })
-  })
-
-  describe("GET /api/users", () => {
-    test("Testing get_users gives correct name", () => {
-      return request(app)
-      .get("/api/users")
-      .then((res) => {
         expect(res.body).toEqual(expect.any(Array));
         expect(res.body[0].name).toBe("Zac");
         expect(res.body[1].name).toBe("Jon");
         expect(res.body[2].name).toBe("Joshua");
         expect(res.body[0].office).toBe("JEMISON");
+        expect(res.type).toEqual('application/json');
       })
     })
   })
@@ -42,8 +34,9 @@ afterAll(async () => {
       return request(app)
         .get("/api/reservations")
         .query({"office": "JEMISON", "date": "01/01/1901", "time": "FULLDAY"})
-        .then(response => {
-          expect(response.statusCode).toBe(200);
+        .then(res => {
+          expect(res.statusCode).toBe(200);
+          expect(res.type).toEqual('application/json');
         });
     });
   });
@@ -64,6 +57,7 @@ afterAll(async () => {
       .send(testReservation)
       .then((res) => {
         expect(res.statusCode).toBe(201);
+        expect(res.type).toEqual('application/json');
         expect(res.body.office).toBe("JEMISON");
         expect(res.body.name).toBe("Jon");
         expect(res.body.seat_no).toBe("20");
