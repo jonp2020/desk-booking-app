@@ -12,10 +12,19 @@ const Body = () => {
 
     const [date, setDate] = useState();
     const [allUsers, setAllUsers] = useState([]);
+    const [table, setTable] = useState();
     const [seat, setSeat] = useState();
-    const [allSeats, setAllSeats] = useState([[{id:0, seatNo:1, tableNo:2, available:true}], [{id:1, seatNo:2, tableNo:3, available:false}]]);
+
+    // {
+    //     T1: { ‘1’: true, ‘2’: ‘false’, ‘3’: true, ‘4’: ‘false’ },
+    //     T2: { ‘5’: ‘false’, ‘6’: ‘false’, ‘7’: ‘false’, ‘8’: ‘false’ },
+    //     T3: { ‘9’: ‘false’, ‘10’: ‘false’, ‘11’: true, ‘12’: ‘false’ },
+    //     T4: { ‘13’: ‘false’, ‘14’: ‘false’, ‘15’: ‘false’, ‘16’: ‘false’ },
+    //     T5: { ‘17’: ‘false’, ‘18’: ‘false’, ‘19’: ‘false’, ‘20’: ‘false’ }
+    //   }
+    const [allSeats, setAllSeats] = useState({T1: { "1": true, "2": false, "3": true, "4": false }});
     const [selectedUser, setSelectedUser] = useState();
-    const [time, setTime] = useState();
+    const [time, setTime] = useState('all-day');
 
     useEffect(() => {
     console.log(seat) 
@@ -38,9 +47,10 @@ const Body = () => {
         retrieveSeats(date, time);
     },[date, time])
 
-    const selectSeat = (seat) => {
-        if (seat.available){
-        setSeat(seat._id)
+    const selectSeat = (event, table, seat) => {
+        if (allSeats[table][seat]){
+            setTable(table)
+        setSeat(seat)
         }else{
             alert("Seat unavailable");  
         }
@@ -58,8 +68,8 @@ const Body = () => {
     {/* USER INFO SELECT */}
     <div className="flex justify-around">
         <div className='flex flex-col'>
-            <label>Enter User</label>
             <select onChange={(event)=> setSelectedUser(event.target.value)}>
+                <option value="" disabled selected>Enter User</option>
                 {allUsers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
             </select>
         </div>
@@ -78,11 +88,13 @@ const Body = () => {
                 <label className='ml-2'>PM</label>
             </div>
             <div className="flex">
-                <input type={'radio'} name="time" value="all-day" onChange={(event)=> setTime(event.target.value)}/>
+                <input type={'radio'} name="time" value="all-day" defaultChecked onChange={(event)=> setTime(event.target.value)}/>
                 <label className='ml-2'>All Day</label>
             </div>        
         </div>     
     </div>
+
+    {seat ? <h1 className='text-center my-8'><span className='mr-4'>Table: {table}</span> Seat: {seat}</h1> : null}
     
     {/* TABLE PLAN */}
     <div className='bg-gray-200 mx-28 rounded-3xl shadow-lg pt-12'>
@@ -104,15 +116,17 @@ const Body = () => {
         <div className="flex justify-center  py-12 ">
            
                 {
-                    allSeats.map((table,i)=> {
-                        return  <div key={i} className="flex flex-col border-4 border-black items-center justify-between p-6 rounded-3xl w-44 h-44">
-                                <div className="flex justify-between w-full">
+                    Object.keys(allSeats).map((table)=> {
+                        return  <div key={table} className="flex flex-col border-4 border-black items-center justify-between p-6 rounded-3xl w-44 h-44">
+                                <div className="grid grid-cols-2 content-between justify-between h-full w-full">
                                { 
-                                table.map((seats,i) =>
+                                Object.keys(allSeats[table]).map((tableSeat) =>
                                {
-                                return <div key={i} id={seats.seatNo} 
-                                className={`h-12 w-12 text-center rounded-lg ${ seats.available ?'bg-green-500' : 'bg-red-500'}`} 
-                                onClick={()=>selectSeat(seats)}>{seats.seatNo}</div>
+                                return <div key={tableSeat} id={tableSeat} 
+                                className={`h-12 w-12 text-center rounded-lg cursor-pointer transition
+                                ${ allSeats[table][tableSeat]?'bg-green-500' : 'bg-red-500'}
+                                ${ seat === tableSeat ?'border-4 border-gray-600 font-bold' : 'border-0 hover:h-14 hover:w-14 hover:shadow-2xl'}`} 
+                                onClick={(event)=>selectSeat(event, table, tableSeat)}>{tableSeat}</div>
                                })
                     }       
                                 
