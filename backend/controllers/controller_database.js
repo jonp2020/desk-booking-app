@@ -5,8 +5,38 @@ const Users = require("../models/model_users");
 const Office = require("../models/model_office");
 
 const get_users = asyncHandler(async (request, response) => {
+
     const users = await Users.find();
-    response.status(200).json(users);
+
+    const {office} = request.query;
+
+    const all_reservations = await Reservations.find({office});
+
+    let date_today = new Date();
+    date_today.setUTCHours(0, 0, 0, 0);
+    date_today = date_today.getTime();
+
+    const valid_reservation_dict = {};
+
+    all_reservations.forEach(reservation => {
+
+        const date_reservation_reversed_string = reservation.date.split("/").reverse().join('-'); // Convert DD/MM/YYYY to YYYY/MM/DD
+
+        let date_reservation = new Date(date_reservation_reversed_string);
+        date_reservation.setUTCHours(0, 0, 0, 0);
+        date_reservation = date_reservation.getTime();
+
+        if (date_reservation >= date_today) {
+
+            if (! valid_reservation_dict[reservation.name]) valid_reservation_dict[reservation.name] = [];
+            valid_reservation_dict[reservation.name].push(reservation);
+
+        }
+
+    });
+
+    response.status(200).json({"users": users, "valid_reservation_dict": valid_reservation_dict});
+
 });
 
 const get_reservations = asyncHandler(async (request, response) => { // Get office reservations
