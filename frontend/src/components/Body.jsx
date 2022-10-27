@@ -14,7 +14,7 @@ const Body = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [table, setTable] = useState();
     const [seat, setSeat] = useState();
-    const [allSeats, setAllSeats] = useState({T1: { "1": true, "2": false, "3": true, "4": false }});
+    const [allSeats, setAllSeats] = useState([]);
     const [selectedUser, setSelectedUser] = useState();
     const [time, setTime] = useState('FULLDAY');
 
@@ -67,9 +67,9 @@ const Body = () => {
     <Title title='Make Booking' />
 
     {/* USER INFO SELECT */}
-    <div className="flex justify-around mx-28">
-        <div className='flex flex-col'>
-            <div className="flex flex-col w-96 h-full bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg">
+    <div className="flex justify-around mx-28 gap-10">
+        <div className='flex flex-col w-1/2'>
+            <div className="flex flex-col h-full bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg">
                 <h1 className="font-bold py-2 text-xl text-center" >Booking Details</h1>
                 <select className="rounded-xl my-2 py-2" onChange={(event)=> setSelectedUser(event.target.value)}>
                 <option value="" disabled selected>Enter User</option>
@@ -98,26 +98,28 @@ const Body = () => {
         </div>
 
        
-        <div className="flex flex-col -mt-6">
+       
+         <div className="flex w-1/2 h-full bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg justify-around">
             <DayPicker 
             mode="single"
             selected={date}
             onSelect={setDate}/>
-            <div className="flex flex-row justify-around mb-6">
+            <div className="flex flex-col justify-evenly mb-6 text-xl">
                 <div className="flex">
                 <input type={'radio'} name="time" value="AM" onChange={(event)=> setTime(event.target.value)} />
-                <label className='ml-2'>AM</label>
+                <label className='ml-2'>Morning slot (9am -1pm)</label>
             </div>
             <div className="flex">
                 <input type={'radio'} name="time" value="PM" onChange={(event)=> setTime(event.target.value)}/>
-                <label className='ml-2'>PM</label>
+                <label className='ml-2'>Afternoon slot (1pm - 5pm)</label>
             </div>
             <div className="flex">
                 <input type={'radio'} name="time" value="FULLDAY" defaultChecked onChange={(event)=> setTime(event.target.value)}/>
-                <label className='ml-2'>All Day</label>
+                <label className='ml-2'>Full day slot (9am - 5pm)</label>
             </div>        </div>
+            </div>     
         </div>     
-    </div>
+   
 
     {seat ? <h1 className='text-center my-8'><span className='mr-4'>Table: {table}</span> Seat: {seat}</h1> : null}
     
@@ -138,7 +140,7 @@ const Body = () => {
             </div>        
         </div>
 
-        <div className="flex justify-center  py-12 ">
+        <div className="flex justify-evenly  py-12 ">
            
                 {
                     Object.keys(allSeats).map((table)=> {
@@ -150,7 +152,7 @@ const Body = () => {
                                 return <div key={tableSeat} id={tableSeat} 
                                 className={`h-12 w-12 text-center rounded-lg cursor-pointer transition
                                 ${ allSeats[table][tableSeat] == "false" ?'bg-green-500' : 'bg-red-500'}
-                                ${ seat === tableSeat ?'border-4 border-gray-600 font-bold' : 'border-0 hover:h-14 hover:w-14 hover:shadow-2xl'}`} 
+                                ${ seat === tableSeat ?'border-4 border-gray-600 font-bold' : 'border-0 hover:scale-105 hover:shadow-2xl'}`} 
                                 onClick={(event)=>selectSeat(event, table, tableSeat)}>{tableSeat}</div>
                                })
                     }       
