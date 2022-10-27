@@ -30,6 +30,7 @@ const get_users = asyncHandler(async (request, response) => {
 
             if (! valid_reservation_dict[reservation.name]) valid_reservation_dict[reservation.name] = [];
             valid_reservation_dict[reservation.name].push(reservation);
+            console.log(reservation)
 
         }
 
