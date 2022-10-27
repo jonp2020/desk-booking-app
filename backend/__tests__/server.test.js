@@ -11,28 +11,19 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await mongoose.connection.close();
-});  
-
-  describe("GET /api/users", () => {
-    test("200 status code", () => {
-      return request(app)
-      .get("/api/users")
-      .then((res) => {
-        expect(res.statusCode).toBe(200);
-      })
-    })
-  })
+});
 
   describe("GET /api/users", () => {
     test("Testing get_users gives correct name", () => {
       return request(app)
       .get("/api/users")
+      .query({"office": "JEMISON"})
       .then((res) => {
-        expect(res.body).toEqual(expect.any(Array));
-        expect(res.body[0].name).toBe("Zac");
-        expect(res.body[1].name).toBe("Jon");
-        expect(res.body[2].name).toBe("Joshua");
-        expect(res.body[0].office).toBe("JEMISON");
+        expect(res.body.users).toEqual(expect.any(Array));
+        expect(res.body.users[0].name).toBe("Zac");
+        expect(res.body.users[1].name).toBe("Jon");
+        expect(res.body.users[2].name).toBe("Joshua");
+        expect(res.body.users[0].office).toBe("JEMISON");
       })
     })
   })
@@ -55,7 +46,7 @@ afterAll(async () => {
       "seat_no": "20",
       "table_no": "T5",
       "monitor": "false",
-      "date": "01/01/1900",
+      "date": "01/01/3000",
       "time": "FULLDAY"
     };
     test("It should post to the db and return a 201 status code", () => {
@@ -69,8 +60,21 @@ afterAll(async () => {
         expect(res.body.seat_no).toBe("20");
         expect(res.body.table_no).toBe("T5");
         expect(res.body.monitor).toBe("false");
-        expect(res.body.date).toBe("01/01/1900");
+        expect(res.body.date).toBe("01/01/3000");
         expect(res.body.time).toBe("FULLDAY");
+      })
+    })
+  })
+
+  describe("GET /api/users", () => {
+    test("200 status code", () => {
+      return request(app)
+      .get("/api/users")
+      .query({"office": "JEMISON"})
+      .then((res) => {
+        expect(res.statusCode).toBe(200);
+        expect(res.body.valid_reservation_dict.Jon).toEqual(expect.any(Array));
+        expect(res.body.valid_reservation_dict.Jon[res.body.valid_reservation_dict.Jon.length - 1].date).toBe("01/01/3000");
       })
     })
   })
@@ -80,7 +84,7 @@ afterAll(async () => {
   test("It should DELETE a record and return a 202", () => {
     return request(app)
       .delete("/api/reservations")
-      .send({"date": "01/01/1900", "time": "FULLDAY", "seat_no": "20", "table_no": "T5"})
+      .send({"date": "01/01/3000", "time": "FULLDAY", "seat_no": "20", "table_no": "T5"})
       .then(response => {
         expect(response.statusCode).toBe(202);
       });
