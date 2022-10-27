@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export async function getUsers(){
+export async function deleteReservation(id){
     try{
-        const res = await axios.get("/api/users", {params: {office: "JEMISON"}});
+        const res = await axios.delete("/api/reservations", {_id: id});
         console.log(res.data)
         return res.data;
     } catch (error) {
