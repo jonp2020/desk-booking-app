@@ -9,6 +9,7 @@ const get_users = asyncHandler(async (request, response) => {
 
     if (!office) return response.status(404).json({"error": 'Please provide an office to see the reservations.'})
 
+    // Hard code office name if needed (uncomment out line above)
     // if (!office) office = 'JEMISON'
 
     office = office.toUpperCase()
