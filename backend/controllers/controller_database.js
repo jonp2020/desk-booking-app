@@ -3,6 +3,7 @@ const { post } = require('../app');
 const Reservations = require('../models/model_reservations');
 const Users = require("../models/model_users");
 const Office = require("../models/model_office");
+const { json } = require('body-parser');
 
 const get_users = asyncHandler(async (request, response) => {
     const users = await Users.find();
@@ -17,6 +18,8 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
     // save that into some kind of new object and send that back
 
     const {office, date, time} = request.query;
+
+    if (!office) return response.status(404).json({"error": 'Please provide an office to see the reservations.'})
     // console.log(office);
     // console.log(date);
     // console.log(time);
@@ -39,6 +42,8 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
     // console.log("Reservations:", reservations);
     // console.log("Office Space:", office_space);
 
+
+
     const {...workstations} = office_space[0].workstations;
 
     // console.log("Workstations (Pre-Processed):", workstations);
@@ -57,13 +62,52 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
 });
 
 const post_reservations = asyncHandler(async (request, response) => { // Post individual's reservation
-    const reservation = await Reservations.create(request.body);
-    response.status(201).json(reservation);
+
+    const { office, date, name, seat_no, table_no, time } = request.body
+
+    const all_reservations = await Reservations.find({office, date});
+
+    const checkDoubleBookings = all_reservations.filter((reservation) => {
+
+        if (reservation.name === name) {
+            
+            if(time === 'FULLDAY' && (reservation.time === 'AM' || reservation.time === 'PM')) return reservation
+            if ((time === 'AM' || time === 'PM') && reservation.time === 'FULLDAY') return reservation
+            if (time === 'AM' && reservation.time === 'AM') return reservation
+            if (time === 'PM' && reservation.time === 'PM') return reservation
+            if (time === 'FULLDAY' && reservation.time === 'FULLDAY') return reservation
+
+        }
+
+        if (reservation.seat_no === seat_no) {
+
+            if(time === 'FULLDAY' && (reservation.time === 'AM' || reservation.time === 'PM')) return reservation
+            if ((time === 'AM' || time === 'PM') && reservation.time === 'FULLDAY') return reservation
+            if (time === 'AM' && reservation.time === 'AM') return reservation
+            if (time === 'PM' && reservation.time === 'PM') return reservation
+            if (time === 'FULLDAY' && reservation.time === 'FULLDAY') return reservation
+        }
+
+
+    }).length > 0
+
+    if (checkDoubleBookings) {
+        response.status(409).json({"error": "Double bookings not permitted."})
+        
+    } else {
+        const reservation = await Reservations.create(request.body);
+        response.status(201).json(reservation);
+    }
+
 });
 
 const delete_reservation = asyncHandler(async (request, response) => {
     const reservationToDelete = await Reservations.find(request.body);
+
+    if (!reservationToDelete.length) return response.status(404).json({"error": "Error - reservation not found. Please refresh the page and try again."})
+
     const reservation = await Reservations.deleteOne(reservationToDelete[0]._id);
+
     if (reservation.acknowledged) {
         response.status(202).json({message: "Your booking has been removed."});
     } else {

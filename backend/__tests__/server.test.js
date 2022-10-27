@@ -75,6 +75,30 @@ afterAll(async () => {
     })
   })
 
+  describe("POST /api/reservations", () => {
+
+    setTimeout(() => {},1000)
+    const testReservation = 	{
+      "office": "JEMISON",
+      "name": "Jon", 
+      "seat_no": "20",
+      "table_no": "T5",
+      "monitor": "false",
+      "date": "01/01/1900",
+      "time": "FULLDAY"
+    };
+    test("It shouldn't allow double bookings", () => {
+      return request(app)
+      .post("/api/reservations")
+      .send(testReservation)
+      .then((res) => {
+        expect(res.statusCode).toBe(409);
+        // expect(res.body.office).toBe("JEMISON");
+        
+      })
+    })
+  })
+
   describe("Testing the API DELETE desks", () => {
 
   test("It should DELETE a record and return a 202", () => {
@@ -86,7 +110,16 @@ afterAll(async () => {
       });
   });
 });
+  describe("Testing the API DELETE desks when record does not exist", () => {
 
+  test("It should fail to find a record to delete and return a 404", () => {
+    return request(app)
+      .delete("/api/reservations")
+      .send({"date": "01/01/1900", "time": "FULLDAY", "seat_no": "20", "table_no": "T5"})
+      .then(response => {
+        expect(response.statusCode).toBe(404);
+      });
+  });
+});
 
- 
   
