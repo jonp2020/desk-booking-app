@@ -1,14 +1,20 @@
 const asyncHandler = require('express-async-handler');
-const { post } = require('../app');
 const Reservations = require('../models/model_reservations');
 const Users = require("../models/model_users");
 const Office = require("../models/model_office");
 
 const get_users = asyncHandler(async (request, response) => {
 
-    const users = await Users.find();
+    let {office} = request.query;
 
-    const {office} = request.query;
+    if (!office) return response.status(404).json({"error": 'Please provide an office to see the reservations.'})
+
+    // Hard code office name if needed (uncomment out line above)
+    // if (!office) office = 'JEMISON'
+
+    office = office.toUpperCase()
+
+    const users = await Users.find({office});
 
     const all_reservations = await Reservations.find({office});
 
@@ -46,10 +52,19 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
     // loop through and create a new object which includes the bookings
     // save that into some kind of new object and send that back
 
-    const {office, date, time} = request.query;
+    let {office, date, time} = request.query;
+
+    if (!office || !date) return response.status(404).json({"error": 'Please provide an office and date to see the reservations.'})
+    // if (!office) office = 'JEMISON'
     // console.log(office);
     // console.log(date);
     // console.log(time);
+
+    office = office.toUpperCase()
+
+    if (!time) time = 'FULLDAY'
+
+    time = time.toUpperCase()
 
     const all_reservations = await Reservations.find({office, date});
     let reservations = [];
@@ -87,13 +102,56 @@ const get_reservations = asyncHandler(async (request, response) => { // Get offi
 });
 
 const post_reservations = asyncHandler(async (request, response) => { // Post individual's reservation
-    const reservation = await Reservations.create(request.body);
-    response.status(201).json(reservation);
+
+    let { office, date, name, seat_no, table_no, time } = request.body
+
+    if (!office || !date || !name || !seat_no || !time) return response.status(404).json({"error": 'Please provide an office, date, name, seat number and time fields to see the reservations.'})
+
+    office = office.toUpperCase()
+    time = time.toUpperCase()
+    const all_reservations = await Reservations.find({office, date});
+
+    const checkDoubleBookings = all_reservations.filter((reservation) => {
+
+        if (reservation.name === name) {
+            
+            if(time === 'FULLDAY' && (reservation.time === 'AM' || reservation.time === 'PM')) return reservation
+            if ((time === 'AM' || time === 'PM') && reservation.time === 'FULLDAY') return reservation
+            if (time === 'AM' && reservation.time === 'AM') return reservation
+            if (time === 'PM' && reservation.time === 'PM') return reservation
+            if (time === 'FULLDAY' && reservation.time === 'FULLDAY') return reservation
+
+        }
+
+        if (reservation.seat_no === seat_no) {
+
+            if(time === 'FULLDAY' && (reservation.time === 'AM' || reservation.time === 'PM')) return reservation
+            if ((time === 'AM' || time === 'PM') && reservation.time === 'FULLDAY') return reservation
+            if (time === 'AM' && reservation.time === 'AM') return reservation
+            if (time === 'PM' && reservation.time === 'PM') return reservation
+            if (time === 'FULLDAY' && reservation.time === 'FULLDAY') return reservation
+        }
+
+
+    }).length > 0
+
+    if (checkDoubleBookings) {
+        response.status(409).json({"error": "Double bookings not permitted."})
+        
+    } else {
+        const reservation = await Reservations.create(request.body);
+        response.status(201).json(reservation);
+    }
+
 });
 
 const delete_reservation = asyncHandler(async (request, response) => {
     const reservationToDelete = await Reservations.find(request.body);
+
+    if (!reservationToDelete.length) return response.status(404).json({"error": "Error - reservation not found. Please refresh the page and try again."})
+
     const reservation = await Reservations.deleteOne(reservationToDelete[0]._id);
+
     if (reservation.acknowledged) {
         response.status(202).json({message: "Your booking has been removed."});
     } else {
