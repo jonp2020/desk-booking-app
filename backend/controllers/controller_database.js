@@ -147,8 +147,8 @@ const post_reservations = asyncHandler(async (request, response) => { // Post in
 });
 
 const delete_reservation = asyncHandler(async (request, response) => {
-    const reservationToDelete = await Reservations.find(request.body);
 
+    const reservationToDelete = await Reservations.find(request.query);
     if (!reservationToDelete.length) return response.status(404).json({"error": "Error - reservation not found. Please refresh the page and try again."})
 
     const reservation = await Reservations.deleteOne(reservationToDelete[0]._id);
