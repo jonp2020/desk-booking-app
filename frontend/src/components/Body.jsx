@@ -129,7 +129,7 @@ const Body = () => {
                         
                     </tbody>
                 </table>
-                </div>) : null}
+                </div>) : <h1>No bookings reserved</h1>}
             </div>
         </div>
 
