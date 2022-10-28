@@ -88,7 +88,7 @@ const Body = () => {
     {/* USER INFO SELECT */}
     <div className="flex flex-col xl:flex-row items-center xl:items-start justify-around mx-28 gap-10">
         <div className='flex flex-col w-full xl:w-1/2'>
-            <div className="flex py-4 flex-col h-full bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg">
+            <div className="flex py-4 flex-col  h-84 min-h-84 bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg">
                 <h1 className="font-bold py-2 text-2xl text-center" >Booking Details</h1>
                 <select className="rounded-xl my-2 py-2" onChange={(event)=> setSelectedUser(event.target.value)}>
                 <option value="" disabled selected>Enter User</option>
@@ -135,7 +135,7 @@ const Body = () => {
 
        
        
-         <div className="flex w-full xl:w-1/2 h-full bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg justify-around">
+         <div className="flex w-full xl:w-1/2 h-84 bg-gray-200 mt-3 mb-12 px-8 rounded-3xl shadow-lg justify-around">
             <DayPicker 
             mode="single"
             selected={date}
